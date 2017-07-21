@@ -20,14 +20,9 @@
 (defn transform [tree]
   (->> tree
        (insta/transform
-        {:oexp (fn [a [_ [op]] b]
-                 (case op
-                   :inp (gen-or (neg a) b)
-                   :xor (gen-and (gen-or a b)
-                                 (gen-and (neg a) (neg b)))
-                   :eq (gen-and (gen-or (neg a) b)
-                                (gen-or a (neg b)))
-                   [:oexp op a b]))})
+        {:oexp (fn [a [op] b] [:oexp op a b])
+         :fact (fn [a [op] b] [:fact op a b])
+         :T (fn [a] [:T (keyword a)])})
        (insta/transform
         {:nexp (fn [[t a]]
                  (case t

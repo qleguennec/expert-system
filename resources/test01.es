@@ -1,6 +1,7 @@
 # this is a comment
 
-!A <=> B
+A + C | A => A
+A + (C | A) => A
 
 =A
 
