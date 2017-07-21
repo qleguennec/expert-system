@@ -1,0 +1,24 @@
+S = <comment>* exp* truth outp
+
+truth = <sp> <'='> <sp> #'[A-Z]'* <comment>
+outp = <sp> <'?'> <sp> #'[A-Z]'* <comment>
+
+T = #'[A-Z]' <sp>
+<exp> = nexp | sexp
+pexp = <opar> exp <cpar>
+oexp = exp op exp
+sexp = <sp> (T | pexp | oexp) <comment>
+nexp = <sp> <not> (nexp | T | pexp | oexp) <comment>
+
+op = (and | or | inp | eq | xor) <sp>
+not = <'!'> <sp>
+and = <'+'> <sp>
+or = <'|'> <sp>
+xor = <'^'> <sp>
+inp = <'=>'> <sp>
+eq = <'<=>'> <sp>
+
+sp = #'\s*'
+comment = ('#' #'.*' '\n')?
+opar = <'('> <sp>
+cpar = <')'> <sp>
