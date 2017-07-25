@@ -1,34 +1,38 @@
 (ns expert-system.parse
   (:require [instaparse.core :as insta]))
 
+(defmacro make-fn [m]
+  `(fn ~m [& args#]
+     (eval `(~'~m ~@args#))))
+
 (defn parse [file]
   (insta/parse
    (insta/parser (clojure.java.io/resource "expert-system.parser"))
    (slurp (clojure.java.io/resource file))))
 
-(defn neg [[t a]]
-  (if (= :nexp t)
-    [:sexp a]
-    [:nexp a]))
+(defn imp [a b]
+  (or (not a) b))
 
-(defn gen-or [a b]
-  [:oexp :or a b])
-
-(defn gen-and [a b]
-  [:oexp :and a b])
+(defn eq [a b]
+  (= a b))
 
 (defn transform [tree]
   (->> tree
        (insta/transform
-        {:oexp (fn [a [op] b] [:oexp op a b])
-         :fact (fn [a [op] b] [:fact op a b])
-         :T (fn [a] [:T (keyword a)])})
-       (insta/transform
-        {:nexp (fn [[t a]]
-                 (case t
-                   :sexp [:nexp a]
-                   :nexp [:sexp a]
-                   [:nexp [t a]]))})))
+        {:nexp (fn [a]
+                 {:op (make-fn not) :args [a]})
+         :pexp (fn [a]
+                 {:op (make-fn identity) :args [a]})
+         :oexp (fn [a [op] b]
+                 {:op (case op
+                        :or (make-fn or)
+                        :and (make-fn and)
+                        :imp (make-fn imp)
+                        :eq (make-fn eq))
+                  :args [a b]})
+         :fact (fn [a [op] b]
+                 {:fact op :args [a b]})
+         :T (fn [a] (keyword a))})))
 
 (defn parse-transform [file]
   (transform (parse file)))

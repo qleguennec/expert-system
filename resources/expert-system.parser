@@ -2,22 +2,22 @@
 
 <comments>  = <comment>*
 <facts> = fact*
-fact = exp (eq | inp) exp <comment>
+fact = exp (eq | imp) exp <comment>
 <truth> = <sp> <'='> <sp> #'[A-Z]'* <comment>
 <outp> = <sp> <'?'> <sp> #'[A-Z]'* <comment>
 
 <exp> = nexp | sexp
 pexp = <opar> exp <cpar>
-oexp = (exp xor exp) / (exp or exp) / (exp and exp)
-sexp = <sp> (T | pexp | oexp)
-nexp = <sp> <not> (nexp | T | pexp | oexp)
+oexp = exp (xor / or / and / imp / eq) exp
+<sexp> = <sp> (pexp / oexp / T)
+nexp = <sp> <not> (nexp | (pexp / oexp / T))
 
 T = <sp> #'[A-Z]'
 not = <sp> <'!'>
 and = <sp> <'+'>
 or = <sp> <'|'>
 xor = <sp> <'^'>
-inp = <sp> <'=>'>
+imp = <sp> <'=>'>
 eq = <sp> <'<=>'>
 
 sp = #'\s*'
